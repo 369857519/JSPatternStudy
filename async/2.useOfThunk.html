@@ -1,0 +1,31 @@
+<script>
+	//thunk/curry化函数
+	var Thunkify=function(fn){
+		return function(){
+			var args=Array.prototype.slice.call(arguments);
+			return function(callback){
+				args.push(callback);
+				return fn.apply(this,args);
+			}
+		}
+	}
+
+	//现在有一个ajax函数
+	function Ajax(type,url,callback){
+		var r=new XMLHttpRequest();
+		r.onreadystatechange=function(e){
+			if(r.readyState===XMLHttpRequest.DONE&&r.status===200){
+				callback(r)
+			}
+		}
+		r.open(type,url)
+		r.send()
+	}
+
+	//thunk的使用
+	var thunkAjax=Thunkify(Ajax);
+	var thunkBaidu=thunkAjax('get','https://www.baidu.com')
+	thunkBaidu((r)=>{
+		console.log(r.responseURL);
+	});
+</script>

@@ -1,0 +1,88 @@
+<script>
+	//先来做一个正常的异步程序，发一个简单的请求
+	function Ajax(type,url,callback){
+		var r=new XMLHttpRequest();
+		r.onreadystatechange=function(e){
+			if(r.readyState===XMLHttpRequest.DONE&&r.status===200){
+				callback(r)
+			}
+		}
+		r.open(type,url)
+		r.send()
+	}
+	//这里是一个简单的请求
+	Ajax('get','https://www.baidu.com',(r)=>{
+		if(r.responseURL){
+			console.log(r.responseURL);
+		}else{
+			console.log('请求失败');
+		}
+	})
+	//链式调用
+	Ajax('get','https://www.baidu.com',(r)=>{
+		if(r.responseURL){
+			console.log(r.responseURL);
+			Ajax('get','https://www.baidu.com',(r)=>{
+				if(r.responseURL){
+					console.log(r.responseURL);
+					Ajax('get','https://www.baidu.com',(r)=>{
+						if(r.responseURL){
+							console.log(r.responseURL);
+						}else{
+							console.log('请求失败');
+						}
+					})
+				}else{
+					console.log('请求失败');
+				}
+			})
+		}else{
+			console.log('请求失败');
+		}
+	})
+
+
+	//链式调用
+	new Promise((resolve,reject)=>{
+		setTimeout(()=>{
+			resolve('异步操作');
+		},500);
+	}).then((data)=>{
+		console.log(data);
+	})
+
+	//链式调用
+	new Promise((resolve,reject)=>{
+		Ajax('get','https://www.baidu.com',(r)=>{
+			if(r.responseURL){
+				resolve(r.responseURL)
+			}else{
+				reject('请求失败')
+			}
+		})
+	}).then((data)=>{
+		console.log(data);
+		return new Promise((resolve,reject)=>{
+			Ajax('get','https://www.baidu.com',(r)=>{
+				if(r.responseURL){
+					resolve(r.responseURL)
+				}else{
+					reject('请求失败')
+				}
+			})
+		})
+	}).then((data)=>{
+		console.log(data);
+		return new Promise((resolve,reject)=>{
+			Ajax('get','https://www.baidu.com',(r)=>{
+				if(r.responseURL){
+					resolve(r.responseURL)
+				}else{
+					reject('请求失败')
+				}
+			})
+		})
+	}).then((data)=>{
+		console.log(data);
+	})
+</script>

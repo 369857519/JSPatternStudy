@@ -1,0 +1,75 @@
+<script>
+	//thunk/curry化函数
+	var Thunkify=function(fn){
+		return function(){
+			var args=Array.prototype.slice.call(arguments);
+			return function(callback){
+				args.push(callback);
+				return fn.apply(this,args);
+			}
+		}
+	}
+
+	//现在有一个ajax函数
+	function Ajax(type,url,callback){
+		var r=new XMLHttpRequest();
+		r.onreadystatechange=function(e){
+			if(r.readyState===XMLHttpRequest.DONE&&r.status===200){
+				callback(r)
+			}
+		}
+		r.open(type,url)
+		r.send()
+	}
+
+
+
+	//一个简单的generator
+	function* helloGenerator(){
+		console.log('generatorStart');
+		console.log(yield 'hello');
+		yield 'world';
+		return 'ending';
+	}
+	var HG=helloGenerator();
+
+	console.log(HG.next());
+	console.log(HG.next(1));
+	console.log(HG.next());
+
+
+
+	//generator与thunk函数
+	var thunkAjax=Thunkify(Ajax);
+	var gen=function* (){
+		var r1=yield thunkAjax('get','https://www.baidu.com');
+		console.log(r1.responseURL);
+		var r2=yield thunkAjax('get','https://www.baidu.com');
+		console.log(r2.responseURL)
+	}
+
+	//这是一个手动执行的版本
+	// var g=gen();
+	// g.next().value(function(r){
+	// 	var r2=g.next(r);
+	// 	r2.value(function(r){
+	// 		g.next(r);
+	// 	})
+	// })
+
+	//那么咱们再接着往下看，如何做一个执行器，传入一个generator之后，就可以正常执行
+	function run(gen){
+		var g=gen();
+		function nextRun(r){
+			var next=g.next(r);
+			if(next.done==true){
+				return;
+			}
+			next.value(nextRun)
+		}
+		nextRun();
+	}
+	run(gen);
+
+	//promise怎么办，是不是也可以和generator进行配合
+</script>
