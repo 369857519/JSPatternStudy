@@ -65,11 +65,46 @@
 			if(next.done==true){
 				return;
 			}
-			next.value(nextRun)
+			if(typeof next.value.then=='function'){
+				next.value.then(nextRun);
+			}else{
+				next.value(nextRun)
+			}
 		}
 		nextRun();
 	}
 	run(gen);
 
 	//promise怎么办，是不是也可以和generator进行配合
+
+	//先来看一个手动的执行promise的版本
+	var ajaxP=(resolve,reject)=>{
+		Ajax('get','https://www.baidu.com',(r)=>{
+			if(r.responseURL){
+				resolve(r)
+			}else{
+				reject('请求失败')
+			}
+		})
+	}
+
+	function* promiseGenerator(){
+		var r1=yield new Promise(ajaxP);
+		console.log(r1.responseURL);
+		var r2=yield new Promise(ajaxP);
+		console.log(r2.responseURL);
+		return 'finish';
+	}
+	
+	// var pg=promiseGenerator();
+	// var n=pg.next();
+	// console.log(n);
+	// n.value.then(function(r){
+	// 	var n=pg.next(r);
+	// 	n.value.then(function(r){
+	// 		pg.next(r);
+	// 	})
+	// })
+
+	run(promiseGenerator);
 </script>
