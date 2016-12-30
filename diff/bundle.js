@@ -48,13 +48,18 @@
 	diff=__webpack_require__(3);
 	patch=__webpack_require__(4);
 	
-	//tagName [properties] children
-	var tree=el('div',{
-		'id':'container'},
-		[el('h1',{style:'color:blue'},['simple virtual dom']),
-		el('p',['Hello,virtual-dom']),
-		el('ul',[el('li')])
+	var tree = el('div', {'id': 'container'}, [
+	    el('h1', {style: 'color: blue'}, ['simple virtual dom']),
+	    el('p', ['Hello, virtual-dom']),
+	    el('ul', [el('li',["I'm an li"])])
 	])
+	
+	// 2. generate a real dom from virtual dom. `root` is a `div` element
+	var root = tree.render()
+	console.log(root);
+	console.log(window.document);
+	
+	window.document.body.append(root);
 
 /***/ },
 /* 1 */
@@ -82,10 +87,32 @@
 	
 		var count=0
 	
+		_.each(this.children,function(child,i){
+			if(child instanceof Element){
+				count+=child.count
+			}else{
+				children[i]=''+child;
+			}
+			count++;
+		})
+	
+		this.count=count;
+	}
+	
+	Element.prototype.render=function(){
+		var el=document.createElement(this.tagName);
+		var props=this.props;
+	
+		for(var propName in props){
+			var propValue = props[propName]
+			_.setAttr(el,propName,propValue);
+		}
+	
 		_.each(this.children,function(child){
 			var childEl=(child instanceof Element)
-			?child.render():document.createTextNode(child)
-			el.appendChild(childEl)
+				?child.render()
+				:document.createTextNode(child)
+			el.appendChild(childEl);
 		})
 	
 		return el;

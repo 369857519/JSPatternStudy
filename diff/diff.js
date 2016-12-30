@@ -2,15 +2,10 @@ var _=require('./util');
 var patch=require('./patch');
 var listDiff=require('list-diff2');
 
-
-
-
-
-
-
 function diff(oldTree,newTree){
 	var index=0;
 	var patches={};
+	//深度优先比较
 	dfsWalk(oldTree,newTree,index,patches);
 	return patches;
 }
@@ -19,19 +14,23 @@ function dfsWalk (oldNode,newNode,index,patches){
 	var currentPatch=[];
 	//Node被删掉了
 	if(newNode===null){
-
-	}else if(_.isString(oldNode)&&_.isString()){
+		//如果node为空，不用做其他的事情
+	}else if(_.isString(oldNode)&&_.isString(newNode)){
+		//新旧节点都是字符串
 		if(newNode!==oldNode){
 			currentPatch.push({type:patch.TEXT,content:newNode})
 		}
-	}else if(
-		oldNode.tagName===newNode.tagName &&
-		oldNode.key===newNode.key
-		){
+		//类型相同，替换字符串
+	}else if(oldNode.tagName===newNode.tagName &&
+		oldNode.key===newNode.key){
+		//是其他的dom元素,做props更新
 		var propsPatches=diffProps(oldNode,newNode)
 		if(propsPatches){
 			currentPatch.push({type:patch.PROPS,props:propsPatches});
 		}
+
+		//在这一步完成一个递归
+		//如果没有标记ignore，则进行新旧孩子的diff
 		if(!isIgnoreChildren('newNode')){
 			diffChildren(
 				oldNode.children,
@@ -42,6 +41,7 @@ function dfsWalk (oldNode,newNode,index,patches){
 				)
 		}
 	}else{
+		//否则，更新整个node
 		currentPatch.push({type:patch.REPLACE,node:newNode})
 	}
 
@@ -51,6 +51,7 @@ function dfsWalk (oldNode,newNode,index,patches){
 }
 
 function diffChildren(oldChildren,newChildren,index,patches,currentPatch){
+	//使用diffs计算区别
 	var diffs=listDiff(oldChildren,newChildren,'key');
 	newChildren=diffs.children;
 
