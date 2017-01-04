@@ -40,6 +40,9 @@ function applyPatches(node,currentPatches){
 			case REORDER:
 				reorderChildren(node,currentPatch.moves)
 				break
+			case PROPS:
+				setProps(node,currentPatch.props)
+				break
 			case TEXT:
 				if(node.textContent){
 					node.textContent=currentPatch.content
@@ -59,7 +62,7 @@ function setProps(node,props){
 			node.removeAttribute(key)
 		}else{
 			var value=props[key]
-			_setAttr(node,key,value)
+			_.setAttr(node,key,value)
 		}
 	}
 }

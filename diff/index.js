@@ -9,7 +9,7 @@ var tree = el('div', {'id': 'container'}, [
 ])
 
 var root = tree.render()
-
+window.document.body.append(root);
 var newTree = el('div', {'id': 'container'}, [
     el('h1', {style: 'color: red'}, ['simple virtal dom']),
     el('p', ['Hello, virtual-dom']),
@@ -19,5 +19,4 @@ var newTree = el('div', {'id': 'container'}, [
 var patches=diff(tree,newTree);
 console.log(patches);
 // 2. generate a real dom from virtual dom. `root` is a `div` element
-
-window.document.body.append(root);
+patch(root,patches);
