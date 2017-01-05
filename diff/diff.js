@@ -2,11 +2,19 @@ var _=require('./util');
 var patch=require('./patch');
 var listDiff=require('list-diff2');
 
+
+//当我们有了最重要的Element,并可以使用render方法进行递归的渲染以后
+//这个时候我们就需要一个搞笑的diff算法
 function diff(oldTree,newTree){
+	//首先这个diff算法里传入了两个简单的树，
+	//旧树和新树
+	//同时做一个index，接着往下看index是干嘛的
 	var index=0;
+	//做一个patches，这个patches则会反悔不同信息
 	var patches={};
-	//深度优先比较
+	//这个时候我们来做第一个比较
 	dfsWalk(oldTree,newTree,index,patches);
+	//先不管这个返回值
 	return patches;
 }
 
