@@ -77,28 +77,41 @@ function dfsWalk (oldNode,newNode,index,patches){
 //currentPatch为上一级声明的patch集
 function diffChildren(oldChildren,newChildren,index,patches,currentPatch){
 	//使用diffs计算区别
-
+	//先来观察一下diffs
+	console.log(index);
+	console.log(oldChildren,newChildren);
 	var diffs=listDiff(oldChildren,newChildren,'key');
-	console.log(diffs);
+	console.log('diffs',diffs);
 	newChildren=diffs.children;
-
+	
+	//如果有新的移动，则新增一个patch，并把patch推入currentPatch
 	if(diffs.moves.length){
 		var reorderPatch={type:patch.REORDER,moves:diffs.moves};
 		currentPatch.push(reorderPatch);
 	}
 
+	//leftNode声明一下
 	var leftNode=null
+	//现在node的index为index
 	var currentNodeIndex=index;
+	//循环一下就的children
 	_.each(oldChildren,function(child,i){
+		//声明一下新的child
 		var newChild=newChildren[i];
+		//如果leftNode的Count存在
+		//则currentNodeIndex就是leftNode.count+currentNodeIndex+1
+		//否则就是currentNodeIndex+1
 		currentNodeIndex=(leftNode&&leftNode.count)
 		?currentNodeIndex+leftNode.count+1
 		:currentNodeIndex+1
+		//再次调用dfsWalk,区分两个节点不同
 		dfsWalk(child,newChild,currentNodeIndex,patches)
+		//完成walk的时候，进行leftNode赋值
 		leftNode=child
 	})
 }
 
+//循环找到不同的props，并进行返回，如果没有就反悔null
 function diffProps(oldNode,newNode){
 	var count=0;
 	var oldProps=oldNode.props
@@ -130,6 +143,7 @@ function diffProps(oldNode,newNode){
 	return propsPatches
 }
 
+//判断是不是有ignore
 function isIgnoreChildren(node){
 	return (node.props&&node.props.hasOwnProperty('ignore'))
 }

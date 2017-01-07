@@ -3,8 +3,8 @@ diff=require('./diff');
 patch=require('./patch');
 
 var tree = el('div', {'id': 'container'}, [
-    el('h1', {style: 'color: blue'}, ['simple virtual dom']),
     el('p', ['Hello, virtual-dom']),
+    el('h1', {style: 'color: blue'}, ['simple virtual dom']),
     el('ul', [el('li',["I'm an li,not a p"])])
 ])
 
